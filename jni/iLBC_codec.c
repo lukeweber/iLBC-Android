@@ -65,7 +65,7 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
     jsize src_size, dest_size;
     jbyte *src_bytes, *dest_bytes;
     
-    int bytes_remaining, bytes_encoded, num_samples;
+    int bytes_remaining, bytes_encoded, bytes;
 
 	encoding = 1;
 	if(Enc_Inst == NULL){
@@ -92,18 +92,22 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
         return -1;
     }
     
+    LOGW("Going to noise supress");
     if(ns_mode > 0){
         noise_supression((short*)src_bytes, bytes_remaining, ns_mode -1);
     }
     
+    LOGW("Going to encode, src_size:%d, dest_size:%d, src_len: %d, src_offset: %d", src_size, dest_size, src_len, src_offset);
     while(bytes_remaining > 0){
-        num_samples = WebRtcIlbcfix_Encode(Enc_Inst, (short* )src_bytes, FRAME_SAMPLES, (WebRtc_Word16 *)dest_bytes);
-        src_bytes += num_samples * sizeof(short);
-        dest_bytes += NO_OF_BYTES_30MS;
-        bytes_remaining -= num_samples * sizeof(short);
-        bytes_encoded += num_samples * sizeof(short);
+        bytes = WebRtcIlbcfix_Encode(Enc_Inst, (short* )src_bytes, FRAME_SAMPLES, (WebRtc_Word16 *)dest_bytes);
+        src_bytes += FRAME_SIZE;
+        bytes_encoded += FRAME_SIZE;
+        bytes_remaining -= FRAME_SIZE;
+        
+        dest_bytes += bytes;
+        LOGW("bytes remaining: %d", bytes_remaining);
     }
-    
+    LOGW("Done encoding");
     src_bytes -= bytes_encoded;
     dest_bytes -= src_len;
     
@@ -139,7 +143,7 @@ jint Java_com_tuenti_androidilbc_Codec_decode(JNIEnv *env, jobject this,
 	jsize src_size, dest_size;
     jbyte *src_bytes, *dest_bytes;
     
-    int num_samples, bytes_remaining, bytes_decoded;
+    int bytes_remaining, bytes_decoded, num_samples;
 	short speechType;
     
     src_size = (*env)->GetArrayLength(env, src);
@@ -160,9 +164,9 @@ jint Java_com_tuenti_androidilbc_Codec_decode(JNIEnv *env, jobject this,
 	while(bytes_remaining > 0){
         num_samples = WebRtcIlbcfix_Decode(Dec_Inst, (short *)src_bytes, NO_OF_BYTES_30MS, (short *)dest_bytes, &speechType);
         src_bytes += NO_OF_BYTES_30MS;
-        dest_bytes += num_samples * sizeof(short);
         bytes_remaining -= NO_OF_BYTES_30MS;
-        bytes_decoded += num_samples * sizeof(short);
+        bytes_decoded += NO_OF_BYTES_30MS;
+        dest_bytes += num_samples * sizeof(short);
     }
 
     src_bytes -= bytes_decoded;
