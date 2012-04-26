@@ -92,12 +92,10 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
         return -1;
     }
     
-    LOGW("Going to noise supress");
     if(ns_mode > 0){
         noise_supression((short*)src_bytes, bytes_remaining, ns_mode -1);
     }
     
-    LOGW("Going to encode, src_size:%d, dest_size:%d, src_len: %d, src_offset: %d", src_size, dest_size, src_len, src_offset);
     while(bytes_remaining > 0){
         bytes = WebRtcIlbcfix_Encode(Enc_Inst, (short* )src_bytes, FRAME_SAMPLES, (WebRtc_Word16 *)dest_bytes);
         src_bytes += FRAME_SIZE;
@@ -105,9 +103,7 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
         bytes_remaining -= FRAME_SIZE;
         
         dest_bytes += bytes;
-        LOGW("bytes remaining: %d", bytes_remaining);
     }
-    LOGW("Done encoding");
     src_bytes -= bytes_encoded;
     dest_bytes -= src_len;
     
