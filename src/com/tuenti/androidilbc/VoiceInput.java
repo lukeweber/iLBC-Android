@@ -21,6 +21,9 @@ import android.util.Log;
  */
 public class VoiceInput extends Thread {
 
+	public static final int ILBC_30_MS_FRAME_SIZE_DECODED = 480;
+	public static final int ILBC_30_MS_FRAME_SIZE_ENCODED = 50;
+
 	private static final String LOG_TAG = "VoiceInput";
 	
 	private static final int BUFFER_SIZE = 320;
@@ -56,7 +59,7 @@ public class VoiceInput extends Thread {
 		audioData = new Vector<byte[]>();
 		totalRawAudioSize = 0;
 		
-		remainderAudioBuffer = new byte[GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED];
+		remainderAudioBuffer = new byte[ILBC_30_MS_FRAME_SIZE_DECODED];
 		remainderBufferSize = 0;
 	}
 	
@@ -73,9 +76,9 @@ public class VoiceInput extends Thread {
 		Log.i(LOG_TAG, "Buffer size: " + minBufferSize);
 		
 		// 480 bytes for 30ms(y mode)
-        int truncated = minBufferSize % GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED;
+        int truncated = minBufferSize % ILBC_30_MS_FRAME_SIZE_DECODED;
         if (truncated != 0) {
-        	minBufferSize += GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED - truncated;
+        	minBufferSize += ILBC_30_MS_FRAME_SIZE_DECODED - truncated;
             Log.i(LOG_TAG, "Extending buffer to: " + minBufferSize);
         }
 		
@@ -148,7 +151,7 @@ public class VoiceInput extends Thread {
                 int recorderSampleSize = 0;
                 
                 // Calculation taken from iLBC Codec.encode()
-                int estimatedEncodedDataLength = minBufferSize / GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED * GenericVoiceController.ILBC_30_MS_FRAME_SIZE_ENCODED;
+                int estimatedEncodedDataLength = minBufferSize / ILBC_30_MS_FRAME_SIZE_DECODED * ILBC_30_MS_FRAME_SIZE_ENCODED;
                 encodedData = new byte[estimatedEncodedDataLength];
                 
                 // Read from AudioRecord buffer.
@@ -167,15 +170,15 @@ public class VoiceInput extends Thread {
                 bytesToEncode = recorderSampleSize + remainderBufferSize;
                 
                 // Calculate what the size of the new remainder should be.
-                int newRemainderBufferSize = bytesToEncode % GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED;
+                int newRemainderBufferSize = bytesToEncode % ILBC_30_MS_FRAME_SIZE_DECODED;
                 bytesToEncode -= newRemainderBufferSize;
                 
             	// Final bit to encode.
             	if(lastRun) {
             		Log.i(LOG_TAG, "Encoding the last piece of data!");
-            		bytesToEncode = GenericVoiceController.ILBC_30_MS_FRAME_SIZE_DECODED;
+            		bytesToEncode = ILBC_30_MS_FRAME_SIZE_DECODED;
             		newRemainderBufferSize = 0;
-            		estimatedEncodedDataLength = GenericVoiceController.ILBC_30_MS_FRAME_SIZE_ENCODED;
+            		estimatedEncodedDataLength = ILBC_30_MS_FRAME_SIZE_ENCODED;
             		tempSamples = new byte[bytesToEncode];
             		
             		// Copy all sample data
