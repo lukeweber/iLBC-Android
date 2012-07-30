@@ -64,6 +64,7 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
     int bytes_remaining, bytes_encoded, bytes;
     short frame_samples, frame_size_bytes;
 
+    bytes_encoded = 0;
     encoding = 1;
     if(Enc_Inst == NULL){
         WebRtcIlbcfix_EncoderCreate(&Enc_Inst);
@@ -79,6 +80,16 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
 
     src_bytes += src_offset;
     bytes_remaining = src_len;
+
+    int encoded_bytes_per_frame;
+    if (frame_length_ms == 20) {
+        encoded_bytes_per_frame = 38;
+    } else if (frame_length_ms == 30) {
+        encoded_bytes_per_frame = 50;
+    } else {
+        LOGE("Frame size must be 20 or 30 ms.");
+        return -1;
+    }
 
     int truncated = bytes_remaining % frame_size_bytes;
     if(truncated){
@@ -98,7 +109,7 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
     while(bytes_remaining > 0){
         bytes = WebRtcIlbcfix_Encode(Enc_Inst, (short* )src_bytes, frame_samples, (WebRtc_Word16 *)dest_bytes);
         src_bytes += frame_size_bytes;
-        bytes_encoded += frame_size_bytes;
+        bytes_encoded += encoded_bytes_per_frame;
         bytes_remaining -= frame_size_bytes;
 
         dest_bytes += bytes;
