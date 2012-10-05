@@ -1,5 +1,5 @@
 #ARCH_ARM_HAVE_ARMV7A := true
-TARGET_ARCH := arm
+#TARGET_ARCH := arm
 
 # Copyright (c) 2011 The WebRTC project authors. All Rights Reserved.
 #
@@ -19,7 +19,7 @@ LOCAL_PATH := $(ILBC_WRAPPER_MAIN_PATH)
 include $(CLEAR_VARS)
 
 
-LOCAL_ARM_MODE := arm
+#LOCAL_ARM_MODE := arm
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES :=\

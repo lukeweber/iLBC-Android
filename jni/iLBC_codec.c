@@ -10,10 +10,10 @@
 #define LOG_TAG "iLBC_codec"
 
 #include <android/log.h>
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__) 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  , LOG_TAG, __VA_ARGS__) 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   , LOG_TAG, __VA_ARGS__) 
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   , LOG_TAG, __VA_ARGS__) 
+#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  , LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   , LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   , LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  , LOG_TAG, __VA_ARGS__)
 
 #define JNI_COPY  0
@@ -65,7 +65,9 @@ jint Java_com_tuenti_androidilbc_Codec_encode(JNIEnv *env, jobject this,
     jsize src_size, dest_size;
     jbyte *src_bytes, *dest_bytes;
 
-    int bytes_remaining, bytes_encoded, bytes;
+    int bytes_remaining = 0;
+    int bytes_encoded = 0;
+    int bytes = 0;
 
     encoding = 1;
     if(Enc_Inst == NULL){
@@ -133,14 +135,16 @@ jint Java_com_tuenti_androidilbc_Codec_resetDecoder(JNIEnv *env, jobject this){
     return 1;
 }
 
-jint Java_com_tuenti_androidilbc_Codec_decode(JNIEnv *env, jobject this, 
+jint Java_com_tuenti_androidilbc_Codec_decode(JNIEnv *env, jobject this,
             jbyteArray src, jint src_offset, jint src_len, jbyteArray dest)
 {
     jsize src_size, dest_size;
     jbyte *src_bytes, *dest_bytes;
 
-    int bytes_remaining, bytes_decoded, num_samples;
-    short speechType;
+    int bytes_remaining = 0;
+    int bytes_decoded = 0;
+    int num_samples = 0;
+    short speechType = 0;
 
     src_size = (*env)->GetArrayLength(env, src);
     src_bytes = (*env)->GetByteArrayElements(env, src, JNI_COPY);
